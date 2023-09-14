@@ -1,14 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './entities/user.entity';
 import { AuthModule } from './modules/auth/auth.module';
-import { JWTService } from './modules/auth/jwt.service';
+import { GameModule } from './modules/game/game.module';
+import { Game } from './entities/game.entity';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([User, Game]),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -26,10 +29,16 @@ import { JWTService } from './modules/auth/jwt.service';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User]),
     AuthModule,
+    GameModule,
   ],
   controllers: [AppController],
-  providers: [AppService, JWTService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe(),
+    },
+  ],
 })
 export class AppModule {}
