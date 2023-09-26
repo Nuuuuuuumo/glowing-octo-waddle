@@ -32,7 +32,6 @@ import { APP_PIPE } from '@nestjs/core';
     AuthModule,
     GameModule,
   ],
-  controllers: [AppController],
   providers: [
     AppService,
     {
