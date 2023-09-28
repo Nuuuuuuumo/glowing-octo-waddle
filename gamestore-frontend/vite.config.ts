@@ -20,6 +20,6 @@ export default defineConfig({
     visualizer({ gzipSize: true, open: true }) as PluginOption,
   ],
   resolve: {
-    alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+    alias: [{find: '@', replacement: path.resolve(__dirname, 'src')}],
   },
 })

@@ -68,6 +68,8 @@ export class AuthService {
     ) {
       return res.status(404).send({ message: 'Invalid Credentials.' });
     }
+    delete foundedUser.createdAt;
+    delete foundedUser.password;
     const accessToken = await this.jwtService.generateTokens(foundedUser, res);
     return res.status(200).send({ ...foundedUser, accessToken });
   }
