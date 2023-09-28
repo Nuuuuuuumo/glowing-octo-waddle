@@ -21,12 +21,13 @@
     "jsx": "react-jsx",
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["*"],
     }
   },
   "include": [
     "src",
     "types/index.d.ts",
+    "types/app.d.ts",
     "node_modules/vite/types/importMeta.d.ts"
   ],
   "references": [
