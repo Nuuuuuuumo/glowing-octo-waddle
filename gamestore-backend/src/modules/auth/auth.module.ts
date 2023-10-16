@@ -18,7 +18,7 @@ import { User } from '../../entities/user.entity';
         return {
           secret: config.get<string>('SECRET_KEY'),
           signOptions: {
-            expiresIn: '1d',
+            expiresIn: '60s',
           },
         };
       },

@@ -2,21 +2,43 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
+import { Request } from 'express';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.get('ACCESS_SECRET_KEY'),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        JwtStrategy.extractAccessToken,
+      ]),
+      secretOrKey: configService.get('SECRET_KEY'),
       ignoreExpiration: false,
     });
   }
 
+  public static extractAccessToken(req: Request): string | null {
+    if (
+      req.cookies &&
+      'accessToken' in req.cookies &&
+      req.cookies.accessToken.length > 0
+    ) {
+      return req.cookies.accessToken;
+    }
+    return null;
+  }
+
   async validate(payload: any) {
-    return {
-      id: payload.id,
-      email: payload.email,
-    };
+    if (!payload) {
+      return null;
+    }
+    const user = await this.userRepository.findOne({ where: payload.sub });
+    if (!user) return null;
+    return user;
   }
 }

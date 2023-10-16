@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { JwtGuard } from '../../guards/jwt-auth.guard';
 import { LoginDto } from './dtos/login.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -31,6 +31,18 @@ export class AuthController {
     return this.authService.loginUser(loginDto, res);
   }
 
+  @ApiResponse({ status: 200, description: 'Verify User' })
+  @UseGuards(JwtGuard)
+  @Post('/me')
+  fetchMe(@Req() req: Request) {
+    return req.user;
+  }
+  @ApiResponse({ status: 200, description: 'User logout.' })
+  @UseGuards(JwtGuard)
+  @Post('/logout')
+  logoutUser(@Req() req: Request, @Res() res: Response) {
+    return this.authService.logoutUser(req, res);
+  }
   @ApiResponse({
     status: 200,
     description: 'Update refresh and access token.',
@@ -40,9 +52,8 @@ export class AuthController {
       },
     },
   })
-  @UseGuards(JwtGuard)
   @Get('/refresh')
-  getAllUsers(@Req() req, @Res() res) {
+  refreshToken(@Req() req: Request, @Res() res: Response) {
     return this.authService.refreshToken(req, res);
   }
 }

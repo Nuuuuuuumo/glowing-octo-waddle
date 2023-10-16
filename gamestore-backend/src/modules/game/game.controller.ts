@@ -4,13 +4,14 @@ import {
   Get,
   Param,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { AddGameDto } from './dtos/addGame.dto';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { JwtGuard } from '../../guards/jwt-auth.guard';
 import { GiftGameDto } from './dtos/giftGame.dto';
 
@@ -32,8 +33,15 @@ export class GameController {
     return this.gameService.giftGame(giftGameDto, res);
   }
 
+  @UseGuards(JwtGuard)
   @Get('getOne/:id')
   getOne(@Param('id') id: string, @Res() res: Response) {
     return this.gameService.getGameById(id, res);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('getGames')
+  getAll(@Res() res: Response) {
+    return this.gameService.getAllGames(res);
   }
 }

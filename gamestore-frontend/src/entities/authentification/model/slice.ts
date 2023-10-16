@@ -1,32 +1,36 @@
-import { createSlice} from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
-import {loginThunk} from "@/features/authentification/login/model/login";
-import {UserSliceState} from "@/entities/authentification/model/types";
+import {normalize, schema} from "normalizr";
 
+import {User} from "@/shared/api";
 
-const initialState: UserSliceState = {
-  data: null,
-  profileData: null,
-  status: statusTypes.INIT,
-  errorMessage: "",
+export type QueryConfig = {
+  completed?: boolean;
+  userId?: number;
 };
-export const userSlice = createSlice({
+
+type NormalizedUsers = Record<number, User>;
+
+export const userSchema = new schema.Entity<User>("users");
+export const normalizeUser = (data: User) =>
+  normalize<User, { users: NormalizedUsers }>(data, userSchema);
+export const normalizeUsers = (data: User[]) =>
+  normalize<User, { users: NormalizedUsers }>(data, [userSchema]);
+
+export const initialState: {
+  data: NormalizedUsers;
+  queryConfig?: QueryConfig;
+} = {
+  data: {},
+  queryConfig: {},
+};
+
+export const sessionSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(loginThunk.pending, (state) => {
-      state.status = statusTypes.LOADING;
-      state.data = null;
-    });
-    builder.addCase(loginThunk.fulfilled, (state, {payload}) => {
-      state.status = statusTypes.SUCCESS;
-      state.data = {...payload};
-      state.errorMessage = null;
-    });
-    builder.addCase(loginThunk.rejected, (state, action) => {
-      state.status = statusTypes.ERROR;
-      state.errorMessage = action.payload;
-    });
-  }});
-
+  reducers: {
+    setQueryConfig: (state, { payload }: PayloadAction<QueryConfig>) => {
+      state.queryConfig = payload;
+    },
+  },
+});

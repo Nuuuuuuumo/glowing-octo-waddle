@@ -21,6 +21,7 @@ import {
 import { IsDecimalMin } from '../validators/number/IsDecimalMin';
 import { IsTrimmedNotEmpty } from '../validators/string/IsNotEmptyAfterTrim';
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 
 @Entity('Game')
 export class Game {
@@ -60,6 +61,7 @@ export class Game {
   @Column('text')
   description!: string;
 
+  @Exclude()
   @ApiProperty({ description: 'Users, who have this game' })
   @Column('varchar', { array: true, default: [] })
   @IsArray()
@@ -115,4 +117,8 @@ export class Game {
   @IsDate()
   @CreateDateColumn()
   createdAt: Date;
+
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
 }

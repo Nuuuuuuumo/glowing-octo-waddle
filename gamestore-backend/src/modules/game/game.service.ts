@@ -6,7 +6,12 @@ import { AddGameDto } from './dtos/addGame.dto';
 import { Response } from 'express';
 import { GiftGameDto } from './dtos/giftGame.dto';
 import { User } from '../../entities/user.entity';
-import { classToPlain } from 'class-transformer';
+import {
+  classToClassFromExist,
+  classToPlain,
+  classToPlainFromExist,
+} from 'class-transformer';
+import { GameDto } from './dtos/game.dto';
 
 @Injectable()
 export class GameService {
@@ -81,5 +86,18 @@ export class GameService {
       return res.status(500).send({ message: 'Incorrect id of game' });
     }
     return res.status(200).send(game);
+  }
+
+  async getAllGames(res: Response) {
+    const games = await this.gameRepository.find({
+      relations: ['usersOwned'],
+    });
+    if (!games) {
+      return res.status(500).send({ message: 'Games didnt found' });
+    }
+    const mappedGames = classToPlainFromExist<Game[]>(games, {
+      excludeExtraneousValues: true,
+    }) as GameDto[];
+    return res.status(200).send(mappedGames);
   }
 }
