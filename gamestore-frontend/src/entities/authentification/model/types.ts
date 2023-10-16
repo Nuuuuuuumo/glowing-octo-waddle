@@ -1,8 +1,15 @@
-import {LoginResponseData} from "@/features/authentification/login/model/types";
+import {User} from "@/shared/api";
 
-export type UserSliceState = {
-  data?: null | LoginResponseData
-  profileData?: null
-  status: statusTypes
-  errorMessage?: string | null
+export type SessionDto = User
+
+export type RequestLoginBody = {
+  email: string
+  password: string
+}
+
+export type Session = {
+  userId: string
+  firstName: string
+  lastName: string
+  email: string
 }

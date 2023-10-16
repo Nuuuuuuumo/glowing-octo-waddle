@@ -2,6 +2,9 @@ import {Box, Container, Paper, Typography} from "@mui/material";
 import {Outlet, ScrollRestoration} from "react-router-dom";
 import {ReactNode} from "react";
 
+import {ToastContainer} from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 import {useStyles} from "@/shared/ui/Layout/layout.styles";
 
 type Props = {
@@ -15,9 +18,10 @@ export const Layout = (props: Props) => {
   const {classes} = useStyles();
   return (
     <Box className={classes.rootWrapper}>
+      <ToastContainer/>
       {props.navbarSlot}
       {props.headerSlot}
-      <Container maxWidth="xl" style={{flex: "1 1 auto"}}>
+      <Container maxWidth="xl" className={classes.container}>
         <Outlet />
       </Container>
       <footer>

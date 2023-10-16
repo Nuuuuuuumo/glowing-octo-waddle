@@ -1,27 +1,43 @@
 import {createBrowserRouter} from "react-router-dom";
 
-import {ErrorPage} from "@/pages/404/Page/404";
-import {BaseLayout} from "@/app/layouts/baseLayout";
-import {AuthGuard} from "@/app/guards/authGuard";
+import {AuthGuard} from "@/app/guards";
+import {LoginPage} from "@/pages/login";
+import {ErrorPage} from "@/pages/404";
+import {BaseLayout} from "@/app/layouts";
+import {GameList} from "@/pages/game-list/GameList";
 
 export const appRouter = () =>
   createBrowserRouter([
     {
-      element: <BaseLayout />,
-      errorElement: <ErrorPage />,
+      element: <BaseLayout/>,
+      errorElement: <ErrorPage/>,
       children: [
         {
           path: "/login",
-          element:(
+          element: (
             <AuthGuard>
-              <div>Login Page</div>
+              <LoginPage/>
             </AuthGuard>
+          ),
+        },
+        {
+          path: "/register",
+          element: (
+            <LoginPage/>
           ),
         },
         {
           path: "/home",
           element: (
             <div>HOME</div>
+          ),
+        },
+        {
+          path: "/games",
+          element: (
+            <AuthGuard>
+              <GameList/>
+            </AuthGuard>
           ),
         },
       ],

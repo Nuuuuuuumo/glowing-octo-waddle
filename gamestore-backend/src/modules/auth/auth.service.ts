@@ -1,5 +1,9 @@
 import { User } from '../../entities/user.entity';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Request, Response } from 'express';
@@ -8,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { JWTService } from './jwt.service';
 import { LoginDto } from './dtos/login.dto';
 import { RegistrationDto } from './dtos/registration.dto';
+import { TokenExpiredError } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +21,8 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly jwtService: JWTService,
   ) {}
+
+  private secretKey: string = this.configService.get('SECRET_KEY');
 
   //REGISTER USER
   async registerUser(registrationDto: RegistrationDto, res: Response) {
@@ -26,9 +33,9 @@ export class AuthService {
       !email?.trim() ||
       !password?.trim()
     ) {
-      return res
-        .status(500)
-        .send({ message: 'Not all required fields have been filled in.' });
+      throw new BadRequestException(
+        'Not all required fields have been filled in.',
+      );
     }
     try {
       const hashSalt = await bcrypt.genSalt(7);
@@ -68,36 +75,45 @@ export class AuthService {
     ) {
       return res.status(404).send({ message: 'Invalid Credentials.' });
     }
+    // REMOVE HARDCODE DELETE
     delete foundedUser.createdAt;
     delete foundedUser.password;
-    const accessToken = await this.jwtService.generateTokens(foundedUser, res);
-    return res.status(200).send({ ...foundedUser, accessToken });
+    await this.jwtService.generateTokens(foundedUser, res);
+    return res.status(200).send({ ...foundedUser });
+  }
+
+  //LOGOUT
+  async logoutUser(req: Request, res: Response) {
+    res.clearCookie('refreshToken');
+    res.clearCookie('accessToken');
+    return res.status(200).send('Successfully unauthorized');
   }
 
   //REFRESH TOKEN
   async refreshToken(req: Request, res: Response) {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ message: 'Refresh token not found' });
+      throw new UnauthorizedException('Refresh token are not set!');
     }
-
-    const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: this.configService.get('REFRESH_SECRET_KEY'),
-    });
-
-    if (!payload) {
-      return res.status(401).json({ message: 'Unauthenticated' });
-    }
-
+    const refreshTokenPayload = await this.jwtService
+      .verifyAsync(refreshToken, {
+        secret: this.secretKey,
+      })
+      .catch(() => {
+        throw new UnauthorizedException(
+          'Refresh token is expired or not valid',
+        );
+      });
     const user = await this.userRepository.findOne({
-      where: { id: payload.id },
+      where: { id: refreshTokenPayload.sub.id },
     });
 
     if (!user) {
-      return res.status(401).send({ message: 'Unauthenticated' });
+      throw new UnauthorizedException(
+        'User doesnt exist. Please check is refresh token valid',
+      );
     }
-
-    const accessToken = await this.jwtService.generateTokens(user, res);
-    return res.status(200).send(accessToken);
+    await this.jwtService.generateTokens(user, res);
+    return res.status(200).send({ message: 'Successfully updated' });
   }
 }

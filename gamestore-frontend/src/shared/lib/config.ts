@@ -1,9 +1,8 @@
 import { z } from "zod";
 
 const envVariables = z.object({
-  BASE_URL: z.string().url(),
+  VITE_BASE_URL: z.string(),
 });
-
 envVariables.parse(import.meta.env);
 
 declare global {
@@ -12,4 +11,4 @@ declare global {
 
 export const config = {
   BASE_URL: import.meta.env.VITE_BASE_URL,
-};
+} as const;

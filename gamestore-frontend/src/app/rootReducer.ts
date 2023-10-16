@@ -1,8 +1,10 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
-import {userSlice} from "@/entities/authentification/model/slice";
+import {baseApi} from "@/shared/api/baseAPI";
+import {sessionSlice} from "@/entities/authentification/model/slice";
 
 
 export const rootReducer = combineReducers({
-  [userSlice.name]: userSlice.reducer,
+  [sessionSlice.name]: sessionSlice.reducer,
+  [baseApi.reducerPath]: baseApi.reducer,
 });
