@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response, Request } from 'express';
-import { JwtGuard } from '../../guards/jwt-auth.guard';
+import { JwtGuard } from '../../common/guards/jwt-auth.guard';
 import { LoginDto } from './dtos/login.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RegistrationDto } from './dtos/registration.dto';
@@ -38,7 +38,6 @@ export class AuthController {
     return req.user;
   }
   @ApiResponse({ status: 200, description: 'User logout.' })
-  @UseGuards(JwtGuard)
   @Post('/logout')
   logoutUser(@Req() req: Request, @Res() res: Response) {
     return this.authService.logoutUser(req, res);

@@ -2,41 +2,77 @@ import {createBrowserRouter} from "react-router-dom";
 
 import {AuthGuard} from "@/app/guards";
 import {LoginPage} from "@/pages/login";
-import {ErrorPage} from "@/pages/404";
+import {GamesPage} from "@/pages/games";
+import {MainPage} from "@/pages/main/ui/MainPage";
+import {GamePage} from "@/pages/game/GamePage";
+import {AddGamePage} from "@/pages/add-game/AddGame";
+import {GuestGuard} from "@/app/guards/guards";
+import {App} from "@/app/App";
 import {BaseLayout} from "@/app/layouts";
-import {GameList} from "@/pages/game-list/GameList";
+import {ErrorPage} from "@/pages/404";
+import {ProfilePage} from "@/pages/profile";
 
 export const appRouter = () =>
   createBrowserRouter([
     {
-      element: <BaseLayout/>,
-      errorElement: <ErrorPage/>,
+      element: <App/>,
+      errorElement: (
+        <BaseLayout>
+          <ErrorPage/>
+        </BaseLayout>
+      ),
       children: [
         {
           path: "/login",
           element: (
-            <AuthGuard>
+            <GuestGuard>
               <LoginPage/>
-            </AuthGuard>
+            </GuestGuard>
           ),
         },
         {
           path: "/register",
           element: (
-            <LoginPage/>
+            <GuestGuard>
+              <LoginPage/>
+            </GuestGuard>
           ),
         },
         {
-          path: "/home",
+          path: "/",
           element: (
-            <div>HOME</div>
+            <MainPage/>
           ),
         },
         {
           path: "/games",
           element: (
             <AuthGuard>
-              <GameList/>
+              <GamesPage/>
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "/profile",
+          element: (
+            <AuthGuard>
+              <ProfilePage/>
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "/addGame",
+          element: (
+            <AuthGuard>
+              <AddGamePage/>
+            </AuthGuard>
+          ),
+        },
+        {
+          path: "/games/:id",
+          element: (
+            <AuthGuard>
+              <GamePage/>
             </AuthGuard>
           ),
         },

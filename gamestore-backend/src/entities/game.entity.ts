@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import {
-  IsArray,
   IsBoolean,
   IsDate,
   IsDecimal,
@@ -18,10 +17,11 @@ import {
   IsUUID,
   Validate,
 } from 'class-validator';
-import { IsDecimalMin } from '../validators/number/IsDecimalMin';
-import { IsTrimmedNotEmpty } from '../validators/string/IsNotEmptyAfterTrim';
+import { IsTrimmedNotEmpty } from '../common/validators/string/IsNotEmptyAfterTrim';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { Genre } from './genre.entity';
+import { Platform } from './platform.entity';
 
 @Entity('Game')
 export class Game {
@@ -30,17 +30,19 @@ export class Game {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ description: 'The name of the game' })
+  @ApiProperty({ description: 'The name of the game', required: false })
   @IsString()
   @Validate(IsTrimmedNotEmpty)
   @Column()
   title!: string;
 
   @ApiProperty({ description: 'The genre of the game' })
-  @IsString()
-  @IsNotEmpty()
-  @Column()
-  genre!: string;
+  @ManyToMany(() => Genre, (genre) => genre.games, {
+    cascade: ['insert', 'update'],
+    nullable: true,
+  })
+  @JoinTable()
+  genres: Genre[];
 
   @ApiProperty({
     description: 'The price of the game',
@@ -49,11 +51,6 @@ export class Game {
   })
   @Column({ type: 'decimal', precision: 10, scale: 2 }) // Adjust precision and scale as needed
   @IsNotEmpty()
-  @IsDecimal(
-    { decimal_digits: '2' },
-    { message: 'Price should be two numbers after dot. For example: 25.99' },
-  )
-  @Validate(IsDecimalMin)
   price: number;
 
   @ApiProperty({ description: 'The description of the game' })
@@ -63,19 +60,20 @@ export class Game {
 
   @Exclude()
   @ApiProperty({ description: 'Users, who have this game' })
-  @Column('varchar', { array: true, default: [] })
-  @IsArray()
   @ManyToMany(() => User, (user) => user.games, {
-    cascade: ['insert', 'update'],
+    cascade: ['insert', 'update', 'remove'],
+    nullable: true,
   })
   @JoinTable()
   usersOwned: User[];
 
   @ApiProperty({ description: 'The platform of the game' })
-  @IsString()
-  @Validate(IsTrimmedNotEmpty)
-  @Column()
-  platform: string;
+  @ManyToMany(() => Platform, (platform) => platform.games, {
+    cascade: ['insert', 'update', 'remove'],
+    nullable: true,
+  })
+  @JoinTable()
+  platforms: Platform[];
 
   @ApiProperty({ description: 'The publisher of the game' })
   @IsString()
@@ -89,23 +87,19 @@ export class Game {
   @Column()
   developer: string;
 
-  @ApiProperty({ description: 'The rating of the game' })
-  @IsString()
-  @Validate(IsTrimmedNotEmpty)
-  @Column()
-  rating: string;
+  @ApiProperty({
+    description: 'The rating of the game',
+    default: 1.1,
+    type: Number,
+  })
+  @Column({ type: 'decimal', precision: 10, default: 0 })
+  rating: number;
 
   @ApiProperty({ description: 'The imageUrl of the game' })
   @IsString()
   @Validate(IsTrimmedNotEmpty)
   @Column('text')
   imageUrl: string;
-
-  @ApiProperty({ description: 'The stockQuantity of the game' })
-  @IsInt()
-  @IsNotEmpty()
-  @Column('integer')
-  stockQuantity: number;
 
   @ApiProperty({ description: 'Is multiplayer support' })
   @IsBoolean()

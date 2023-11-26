@@ -1,6 +1,7 @@
 import { User } from '../../entities/user.entity';
 import {
   BadRequestException,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,10 +10,9 @@ import { Repository } from 'typeorm';
 import { Request, Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { JWTService } from './jwt.service';
+import { JWTService } from '../jwt/jwt.service';
 import { LoginDto } from './dtos/login.dto';
 import { RegistrationDto } from './dtos/registration.dto';
-import { TokenExpiredError } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -26,12 +26,13 @@ export class AuthService {
 
   //REGISTER USER
   async registerUser(registrationDto: RegistrationDto, res: Response) {
-    const { firstName, lastName, email, password } = registrationDto;
+    const { firstName, lastName, email, password, imageUrl } = registrationDto;
     if (
       !firstName?.trim() ||
       !lastName?.trim() ||
       !email?.trim() ||
-      !password?.trim()
+      !password?.trim() ||
+      !imageUrl?.trim()
     ) {
       throw new BadRequestException(
         'Not all required fields have been filled in.',
@@ -86,7 +87,9 @@ export class AuthService {
   async logoutUser(req: Request, res: Response) {
     res.clearCookie('refreshToken');
     res.clearCookie('accessToken');
-    return res.status(200).send('Successfully unauthorized');
+    return res
+      .status(HttpStatus.OK)
+      .send({ message: 'Successfully unauthorized' });
   }
 
   //REFRESH TOKEN

@@ -1,10 +1,12 @@
 import {useForm} from "react-hook-form";
 
-import {zodResolver} from "@hookform/resolvers/zod";
-
 import {Button, FormControl, TextField} from "@mui/material";
 
-import {toast} from "react-toastify";
+import {yupResolver} from "@hookform/resolvers/yup";
+
+import {enqueueSnackbar} from "notistack";
+
+import {useNavigate} from "react-router-dom";
 
 import {useStyles} from "./loginForm.styles";
 
@@ -14,6 +16,7 @@ import {useLoginMutation} from "@/entities/authentification/api/authApi";
 
 export const LoginForm = () => {
   const {classes} = useStyles();
+  const navigate = useNavigate();
   const [loginMutation, {error, isLoading}] = useLoginMutation();
 
   const {
@@ -21,23 +24,19 @@ export const LoginForm = () => {
     handleSubmit,
     register,
   } = useForm<LoginFormSchema>({
-    resolver: zodResolver(loginFormSchema),
+    resolver: yupResolver(loginFormSchema),
   });
+
 
   const onSubmitHandler = async (loginDto: RequestLoginBody) => {
     await loginMutation(loginDto)
       .unwrap()
-      .then((data) => {
-        console.log(data);
+      .then((payload) => {
+        enqueueSnackbar(`Welcome ${payload.firstName}`, {variant: "success"});
+        navigate("/");
       })
-      .catch((error) => {
-        if ("data" in error) {
-          return toast.error(error.data.message);
-        }
-      });
+      .catch(() => enqueueSnackbar("An error occurred.", {variant: "error"}));
   };
-
-
   return (
     <>
       <form className={classes.loginForm} onSubmit={handleSubmit(onSubmitHandler)}>

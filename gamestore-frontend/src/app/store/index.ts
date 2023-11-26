@@ -7,9 +7,12 @@ export function makeStore() {
   return configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) => {
-      return getDefaultMiddleware().concat(baseApi.middleware);
+      return getDefaultMiddleware({serializableCheck: false}).concat(baseApi.middleware);
     },
   });
 }
 
 export const appStore = makeStore();
+
+export type RootState = ReturnType<typeof appStore.getState>
+export type AppDispatch = typeof appStore.dispatch

@@ -33,6 +33,9 @@ export class User {
   @Exclude()
   password!: string;
 
+  @Column()
+  imageUrl: string;
+
   @CreateDateColumn()
   createdAt: Date;
 }

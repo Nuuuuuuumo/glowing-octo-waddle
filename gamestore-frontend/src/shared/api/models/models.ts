@@ -1,16 +1,15 @@
 export type Game = {
   id: string
   title: string
-  genre: string
-  price: string
+  genres: Genre[]
+  price: number
   description: string
-  platform: string
+  platforms: Platform[]
   publisher: string
   developer: string
-  rating: string
+  rating: number
   imageUrl: string
   usersOwned: User[]
-  stockQuantity: number
   multiplayerSupport: boolean
   createdAt: string
 };
@@ -23,4 +22,14 @@ export type User = {
   password: string
   games: Game[]
   createdAt: string
+  imageUrl: string
+}
+
+export type Genre = {
+  id: string
+  name?: string
+}
+export type Platform = {
+  id: string
+  name?: string
 }
