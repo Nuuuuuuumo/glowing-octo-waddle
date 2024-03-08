@@ -14,5 +14,5 @@ export class RegistrationDto {
   password: string;
 
   @ApiProperty({ type: String })
-  imageUrl: string;
+  avatarURL: string;
 }

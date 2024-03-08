@@ -11,6 +11,7 @@ import {App} from "@/app/App";
 import {BaseLayout} from "@/app/layouts";
 import {ErrorPage} from "@/pages/404";
 import {ProfilePage} from "@/pages/profile";
+import {RegistrationPage} from "@/pages/registration/ui/RegistrationPage";
 
 export const appRouter = () =>
   createBrowserRouter([
@@ -34,7 +35,7 @@ export const appRouter = () =>
           path: "/register",
           element: (
             <GuestGuard>
-              <LoginPage/>
+              <RegistrationPage/>
             </GuestGuard>
           ),
         },

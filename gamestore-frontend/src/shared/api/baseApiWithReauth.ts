@@ -24,10 +24,8 @@ export const baseQueryWithReAuth: BaseQueryFn<
       if (refreshResult.data) {
         result = await baseQuery(args, api, extraOptions);
       } else {
-        enqueueSnackbar((refreshResult.error as ErrorHandle).data.message, {variant: "error"});
+        enqueueSnackbar((refreshResult as ErrorHandle).data.message, {variant: "error"});
       }
-    } else {
-      enqueueSnackbar((result.error as ErrorHandle).data.message, {variant: "error"});
     }
   }
 

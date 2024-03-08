@@ -20,7 +20,7 @@ export const GameList = ({games, isFetching}: Partial<GameListProps>) => {
     <List className={classes.list}>
       {games?.map((game) => {
         return (
-          <ListItem className={classes.item}>
+          <ListItem key={game.id} className={classes.item}>
             <GameCard key={game.id} game={game}/>
           </ListItem>
         );
@@ -28,4 +28,4 @@ export const GameList = ({games, isFetching}: Partial<GameListProps>) => {
     </List>
   );
 }
-  ;
+;

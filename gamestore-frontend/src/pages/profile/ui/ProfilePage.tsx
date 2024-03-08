@@ -15,7 +15,7 @@ export const ProfilePage = () => {
           <Grid item xs={12} md={4}>
             <Avatar
               alt={`${profileData.firstName} ${profileData.lastName}`}
-              src={profileData.imageUrl}
+              src={profileData.avatarURL}
               sx={{width: 150, height: 150}}
             />
           </Grid>

@@ -4,14 +4,13 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import {
   IsBoolean,
   IsDate,
-  IsDecimal,
-  IsInt,
   IsNotEmpty,
   IsString,
   IsUUID,
@@ -22,6 +21,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { Genre } from './genre.entity';
 import { Platform } from './platform.entity';
+import { Bucket } from './bucket.entity';
 
 @Entity('Game')
 export class Game {
@@ -42,7 +42,13 @@ export class Game {
     nullable: true,
   })
   @JoinTable()
-  genres: Genre[];
+  genres: string;
+
+  @ManyToMany(() => Bucket, (bucket) => bucket.games, {
+    cascade: ['insert', 'update'],
+    nullable: true,
+  })
+  bucket: Bucket;
 
   @ApiProperty({
     description: 'The price of the game',

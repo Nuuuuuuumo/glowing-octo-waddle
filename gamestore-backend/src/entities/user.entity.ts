@@ -2,12 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Game } from './game.entity';
 import { IsNotEmpty, IsUUID } from 'class-validator';
 import { Exclude } from 'class-transformer';
+import { Bucket } from './bucket.entity';
 
 @Entity('User')
 export class User {
@@ -22,9 +25,11 @@ export class User {
   @Column()
   lastName!: string;
 
-  @Column('varchar', { array: true, default: [] })
   @ManyToMany(() => Game, (game) => game.usersOwned)
   games: Game[];
+
+  @OneToOne(() => Bucket, (bucket) => bucket.user)
+  bucket: Bucket;
 
   @Column({ unique: true })
   email!: string;
@@ -34,7 +39,7 @@ export class User {
   password!: string;
 
   @Column()
-  imageUrl: string;
+  avatarURL: string;
 
   @CreateDateColumn()
   createdAt: Date;

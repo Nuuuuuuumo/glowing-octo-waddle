@@ -34,7 +34,7 @@ export const ProfileButton = () => {
     <>
       <Tooltip title="Open settings">
         <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-          <Avatar alt="Remy Sharp" src={userData?.imageUrl}/>
+          <Avatar alt="Remy Sharp" src={userData?.avatarURL}/>
         </IconButton>
       </Tooltip>
       <Menu
@@ -54,6 +54,7 @@ export const ProfileButton = () => {
         onClose={handleCloseUserMenu}
       >
         <MenuItem onClick={handleCloseUserMenu}><RedirectLink redirectTo="/profile">Profile</RedirectLink></MenuItem>
+        <MenuItem onClick={handleCloseUserMenu}><RedirectLink redirectTo="/profile">Bucket</RedirectLink></MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </>

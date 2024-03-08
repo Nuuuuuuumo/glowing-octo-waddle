@@ -22,7 +22,7 @@ export type User = {
   password: string
   games: Game[]
   createdAt: string
-  imageUrl: string
+  avatarURL: string
 }
 
 export type Genre = {

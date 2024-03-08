@@ -1,4 +1,4 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -6,9 +6,9 @@ import { User } from './entities/user.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { GameModule } from './modules/game/game.module';
 import { Game } from './entities/game.entity';
-import { APP_PIPE } from '@nestjs/core';
 import { AwsModule } from './modules/aws/aws.module';
 import { JwtModule } from './modules/jwt/jwt.module';
+import { BucketModule } from './modules/bucket/bucket.module';
 
 @Module({
   imports: [
@@ -62,6 +62,7 @@ u+eHFzRpOTaR2MKFOKcUve8gR0Zmk7yLAZn4wreHz1Jh+GovUA==
     GameModule,
     AwsModule,
     JwtModule,
+    BucketModule,
   ],
   providers: [AppService],
 })

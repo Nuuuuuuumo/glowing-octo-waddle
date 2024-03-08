@@ -13,11 +13,13 @@ import { ConfigService } from '@nestjs/config';
 import { JWTService } from '../jwt/jwt.service';
 import { LoginDto } from './dtos/login.dto';
 import { RegistrationDto } from './dtos/registration.dto';
+import { AwsService } from '../aws/aws.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly awsService: AwsService,
     private readonly configService: ConfigService,
     private readonly jwtService: JWTService,
   ) {}
@@ -25,14 +27,19 @@ export class AuthService {
   private secretKey: string = this.configService.get('SECRET_KEY');
 
   //REGISTER USER
-  async registerUser(registrationDto: RegistrationDto, res: Response) {
-    const { firstName, lastName, email, password, imageUrl } = registrationDto;
+  async registerUser(
+    dto: RegistrationDto,
+    avatarURL: Express.Multer.File,
+    res: Response,
+  ) {
+    const { firstName, lastName, email, password } = dto;
+    const s3Response = await this.awsService.uploadImage(avatarURL);
+    const newDto = { ...dto, avatarURL: s3Response };
     if (
       !firstName?.trim() ||
       !lastName?.trim() ||
       !email?.trim() ||
-      !password?.trim() ||
-      !imageUrl?.trim()
+      !password?.trim()
     ) {
       throw new BadRequestException(
         'Not all required fields have been filled in.',
@@ -42,7 +49,7 @@ export class AuthService {
       const hashSalt = await bcrypt.genSalt(7);
       const hashedPassword = await bcrypt.hash(password, hashSalt);
       const newUser = await this.userRepository.save({
-        ...registrationDto,
+        ...newDto,
         password: hashedPassword,
       });
       const accessToken = await this.jwtService.generateTokens(newUser, res);

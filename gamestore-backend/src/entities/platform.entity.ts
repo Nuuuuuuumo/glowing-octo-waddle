@@ -20,7 +20,6 @@ export class Platform {
   name: string;
 
   @ManyToMany(() => Game, (game) => game.platforms)
-  @JoinTable()
   @Exclude()
   games: Game[];
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseArrayPipe,
@@ -52,6 +53,12 @@ export class GameController {
     return this.gameService.getGameById(id, res);
   }
 
+  @UseGuards(JwtGuard)
+  @Delete('game/:id')
+  delete(@Param('id') id: string, @Res() res: Response) {
+    return this.gameService.deleteGame(id, res);
+  }
+
   @Get('/')
   getGames(@Res() res: Response) {
     return this.gameService.getGames(res);
@@ -65,7 +72,6 @@ export class GameController {
   @Get('/filteredGames')
   getFilteredGames(
     @Res() res: Response,
-    @Req() req: Request,
     @Query('title') title: string,
     @Query('rating') rating: string,
     @Query('genres', new ParseArrayPipe({ separator: ',', optional: true }))
@@ -79,7 +85,7 @@ export class GameController {
       genres: genres,
       platforms: platforms,
     };
-    return this.gameService.getFilteredGames(req, res, queryParams);
+    return this.gameService.getFilteredGames(res, queryParams);
   }
 
   @UseGuards(JwtGuard)

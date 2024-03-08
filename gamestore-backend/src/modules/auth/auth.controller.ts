@@ -5,14 +5,17 @@ import {
   Post,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response, Request } from 'express';
 import { JwtGuard } from '../../common/guards/jwt-auth.guard';
 import { LoginDto } from './dtos/login.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RegistrationDto } from './dtos/registration.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Authorization')
 @Controller('auth')
@@ -21,8 +24,15 @@ export class AuthController {
 
   @ApiResponse({ status: 200, description: 'User registration.' })
   @Post('/registration')
-  registerUser(@Body() registrationDto: RegistrationDto, @Res() res: Response) {
-    return this.authService.registerUser(registrationDto, res);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('avatarURL'))
+  registration(
+    @UploadedFile() avatarURL: Express.Multer.File,
+    @Body() formData: Record<string, string>,
+    @Res() res: Response,
+  ) {
+    const registrationDTO: RegistrationDto = JSON.parse(formData['data']);
+    return this.authService.registerUser(registrationDTO, avatarURL, res);
   }
 
   @ApiResponse({ status: 200, description: 'User login.' })
@@ -37,11 +47,13 @@ export class AuthController {
   fetchMe(@Req() req: Request) {
     return req.user;
   }
+
   @ApiResponse({ status: 200, description: 'User logout.' })
   @Post('/logout')
   logoutUser(@Req() req: Request, @Res() res: Response) {
     return this.authService.logoutUser(req, res);
   }
+
   @ApiResponse({
     status: 200,
     description: 'Update refresh and access token.',

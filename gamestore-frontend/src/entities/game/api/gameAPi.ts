@@ -34,6 +34,12 @@ export const gameApi = baseApi.injectEndpoints({
 
       }),
     }),
+    deleteGame: build.mutation<string, string>({
+      query: (id) => ({
+        url: `games/game/${id}`,
+        method: "DELETE",
+      }),
+    }),
     getGenresAndPlatforms: build.query<ResponseGetGenresAndPlatforms, void>({
       query: () => ({
         url: "games/getGenresAndPlatforms",
@@ -44,4 +50,4 @@ export const gameApi = baseApi.injectEndpoints({
   }),
 });
 
-export const {useGetGameQuery, useAddGameMutation, useGetGenresAndPlatformsQuery, useGetGamesQuery, useLazyGetFilteredGamesQuery} = gameApi;
+export const {useGetGameQuery, useAddGameMutation, useGetGenresAndPlatformsQuery, useGetGamesQuery, useLazyGetFilteredGamesQuery, useDeleteGameMutation} = gameApi;

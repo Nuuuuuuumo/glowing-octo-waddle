@@ -1,12 +1,17 @@
 import {AppBar, Box, IconButton, Toolbar} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 
+import {useStyles} from "./header.styles";
+
 import {ProfileButton} from "@/features/user";
 import {RedirectLink} from "@/shared/ui";
-
+import {useAppSelector} from "@/shared/model/hooks";
+import {selectIsAuth} from "@/entities/authentification/model/slice";
+import {CartButton} from "@/features/user/CartButton/ui/CartButton";
 
 export const Header = () => {
-
+  const {classes} = useStyles();
+  const isAuth = useAppSelector(selectIsAuth);
   return (
     <>
       <AppBar position="static">
@@ -16,16 +21,25 @@ export const Header = () => {
             edge="start"
             color="inherit"
             aria-label="menu"
-            sx={{mr: 2}}
           >
             <MenuIcon/>
           </IconButton>
-          <Box sx={{flexGrow: 1, display: "flex", gap: "10px"}}>
-            <RedirectLink sx={{fontWeight: 500, fontSize: "1.25rem"}} redirectTo="/"></RedirectLink>
-            <RedirectLink sx={{fontWeight: 500, fontSize: "1.25rem"}} redirectTo="/games">Games</RedirectLink>
-            <RedirectLink sx={{fontWeight: 500, fontSize: "1.25rem"}} redirectTo="/addGame">AddGame</RedirectLink>
+          <RedirectLink redirectTo="/">Game Store</RedirectLink>
+          <Box className={classes.rootWrapper}>
+            <RedirectLink redirectTo="/games">Games</RedirectLink>
+            <RedirectLink redirectTo="/addGame">AddGame</RedirectLink>
           </Box>
-          <ProfileButton/>
+          {isAuth ? (
+            <>
+              <CartButton/>
+              <ProfileButton/>
+            </>
+          ) : (
+            <>
+              <RedirectLink redirectTo="/login">Sign in</RedirectLink>
+              <RedirectLink redirectTo="/register">Sign Up</RedirectLink>
+            </>)
+          }
         </Toolbar>
       </AppBar>
     </>

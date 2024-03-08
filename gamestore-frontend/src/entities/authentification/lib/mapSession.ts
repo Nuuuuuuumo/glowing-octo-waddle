@@ -7,7 +7,7 @@ export const mapSession = (dto: User): Session => {
     firstName: dto.firstName,
     lastName: dto.lastName,
     email: dto.email,
-    imageUrl: dto.imageUrl,
+    avatarURL: dto.avatarURL,
     createdAt: dto.createdAt,
   };
 };

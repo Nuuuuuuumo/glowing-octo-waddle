@@ -21,7 +21,6 @@ export class Genre {
   name: string;
 
   @ManyToMany(() => Game, (game) => game.genres)
-  @JoinTable()
   @Exclude()
-  games: Game[];
+  games: string;
 }

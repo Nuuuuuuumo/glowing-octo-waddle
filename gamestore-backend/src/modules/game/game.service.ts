@@ -16,7 +16,6 @@ import { AwsService } from '../aws/aws.service';
 export class GameService {
   constructor(
     private readonly gameRepository: GameRepository,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Genre)
     private readonly genreRepository: Repository<Genre>,
     @Inject(AwsService)
@@ -30,6 +29,11 @@ export class GameService {
     const newDto = { ...dto, imageUrl: s3Response };
     const game = await this.gameRepository.createGame(newDto);
     return res.status(HttpStatus.OK).send(game);
+  }
+
+  async deleteGame(id: string, res: Response) {
+    await this.gameRepository.delete(id);
+    return res.status(HttpStatus.OK).send('Successfully deleted');
   }
 
   async giftGame(dto: GiftGameDto, res: Response) {
@@ -50,19 +54,17 @@ export class GameService {
     return res.status(HttpStatus.OK).send(game);
   }
 
-  async getFilteredGames(
-    req: Request,
-    res: Response,
-    queryParams?: QueryParamsTypes,
-  ) {
+  async getFilteredGames(res: Response, queryParams?: QueryParamsTypes) {
     const { title, rating, genres, platforms } = queryParams;
     const mappedGenres = genres.map((item) => item.toLowerCase());
     const mappedPlatforms = platforms.map((item) => item.toLowerCase());
-    const builder = await this.gameRepository
-      .createQueryBuilder('game')
-      .leftJoinAndSelect('game.genres', 'genres')
-      .leftJoinAndSelect('game.platforms', 'platforms')
-      .where('game.title ILIKE :title', { title: `%${title}%` });
+    const [builder] = await Promise.all([
+      this.gameRepository
+        .createQueryBuilder('game')
+        .leftJoinAndSelect('game.genres', 'genres')
+        .leftJoinAndSelect('game.platforms', 'platforms')
+        .where('game.title ILIKE :title', { title: `%${title}%` }),
+    ]);
 
     if (!isNaN(+rating) && rating !== '') {
       builder.andWhere('game.rating > :rating', { rating });

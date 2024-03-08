@@ -16,6 +16,15 @@ export const sessionApi = baseApi.injectEndpoints({
       invalidatesTags: [AUTH_TAG],
       transformResponse: (response: User): Session => mapSession(response),
     }),
+    registration: build.mutation<Session, FormData>({
+      query: (body) => ({
+        url: "auth/registration",
+        method: "POST",
+        body: body,
+      }),
+      invalidatesTags: [AUTH_TAG],
+      transformResponse: (response: User): Session => mapSession(response),
+    }),
     me: build.query({
       query: () => ({
         url: "auth/me",
@@ -32,4 +41,4 @@ export const sessionApi = baseApi.injectEndpoints({
   }),
 });
 
-export const {useLoginMutation, useMeQuery, useLogoutMutation} = sessionApi;
+export const {useRegistrationMutation, useLoginMutation, useMeQuery, useLogoutMutation} = sessionApi;
